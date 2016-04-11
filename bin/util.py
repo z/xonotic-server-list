@@ -11,9 +11,9 @@ def write_to_json(output, file):
 
     check_if_not_create(file)
 
-    fo = open(file, 'w')
-    fo.write(json.dumps(output))
-    fo.close()
+    f = open(file, 'w')
+    f.write(json.dumps(output))
+    f.close()
 
 
 def read_json_file(file):
