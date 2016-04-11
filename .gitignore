@@ -1,0 +1,8 @@
+.idea
+*.swp
+*.swo
+config.ini
+venv
+activate
+__pycache__
+stats.json
