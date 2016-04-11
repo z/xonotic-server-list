@@ -29,7 +29,7 @@ cp config/example.config.ini config/config.ini
 
 Its contents should appear similar to below:
 
-```
+```ini
 [default]
 master_server = dpmaster.deathmask.net
 stats_file = resources/data/stats.json
@@ -59,16 +59,16 @@ See help for additional options:
 
 The generated json is an array of objects padded by a `data` object.
 
-```
+```json
 {
-    data: [
+    "data": [
         {
-            time: unixtime,
-            total_players: 30,
-            countries: {
-                EUR: 20,
-                AUS: 2,
-                USA: 8
+            "time": 1460344051,
+            "total_players": 30,
+            "countries": {
+                "EUR": 20,
+                "AUS": 2,
+                "USA": 8
             }
         },
         …
