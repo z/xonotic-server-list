@@ -8,9 +8,14 @@ Coming soon.
 
 ## Backend/Middleware
 
+The heavy lifting is handled by code that acts as middleware between the
+master server and the xonotic-server-list front-end. The master server
+exposes a few ways to query qstat, returning xml, which the middleware
+converts to JSON.  
+
 ### Installation
 
-Setup a venv and install the requirements
+Setup a venv and install the requirements:
 
 ```
 virtualenv -p /usr/bin/python3 venv
