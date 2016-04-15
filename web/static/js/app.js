@@ -60,6 +60,7 @@ $(document).ready(function () {
       'countries_RU',
       'countries_GB',
       'countries_ZA',
+      'countries_NL',
       'countries_CL'
     ];
 
