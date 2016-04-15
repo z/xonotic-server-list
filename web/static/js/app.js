@@ -5,16 +5,15 @@ $(document).ready(function () {
     prefix = prefix || "";
 
     for (var k in obj) {
-        if (includePrototype || obj.hasOwnProperty(k)) {
-            var prop = obj[k];
-            if (prop && typeof prop === "object" &&
-                !(prop instanceof Date || prop instanceof RegExp)) {
-                flatten(prop, includePrototype, into, prefix + k + "_");
-            }
-            else {
-                into[prefix + k] = prop;
-            }
+      if (includePrototype || obj.hasOwnProperty(k)) {
+        var prop = obj[k];
+        if (prop && typeof prop === "object" && !(prop instanceof Date || prop instanceof RegExp)) {
+          flatten(prop, includePrototype, into, prefix + k + "_");
         }
+        else {
+          into[prefix + k] = prop;
+        }
+      }
     }
 
     return into;
@@ -22,23 +21,23 @@ $(document).ready(function () {
 
   // Handle tabs on page reload
   function handleTabs() {
-      // Javascript to enable link to tab
-      var url = document.location.toString();
-      if (url.match('#')) {
-          $('.navbar-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
-      }
+    // Javascript to enable link to tab
+    var url = document.location.toString();
+    if (url.match('#')) {
+      $('.navbar-tabs a[href=#' + url.split('#')[1] + ']').tab('show');
+    }
 
-      // Change hash for page-reload
-      $('.navbar-tabs a').on('shown.bs.tab', function (e) {
-          history.pushState( null, null, $(this).attr('href') );
-          window.location.hash = e.target.hash;
-      });
+    // Change hash for page-reload
+    $('.navbar-tabs a').on('shown.bs.tab', function (e) {
+      history.pushState(null, null, $(this).attr('href'));
+      window.location.hash = e.target.hash;
+    });
   }
 
   handleTabs();
 
   // Get the stats and filter them down.
-  $.get('resources/data/stats.json', function(response) {
+  $.get('resources/data/stats.json', function (response) {
 
     var stats_data = response.data;
 
@@ -87,14 +86,14 @@ $(document).ready(function () {
       },
       axis: {
         x: {
-                type: 'timeseries',
-                tick: {
-                        format: '%Y-%m-%d %H:%M'
-                }
+          type: 'timeseries',
+          tick: {
+            format: '%Y-%m-%d %H:%M'
+          }
         }
       },
       subchart: {
-          show: true
+        show: true
       },
       point: {
         show: false
