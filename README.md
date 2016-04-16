@@ -39,9 +39,13 @@ Its contents should appear similar to below:
 master_server = dpmaster.deathmask.net
 stats_file = resources/data/stats.json
 ip_location_db = resources/data/GeoLite2-Country.mmdb
+stats_database = sqlite:///resources/data/stats.db
+frontend_url = http://localhost:8003
 ```
 
 ### Usage
+
+#### Collecting Data
 
 Print current stats to output:
 
@@ -80,6 +84,27 @@ The generated json is an array of objects padded by a `data` object.
         …
     ]
 }
+```
+
+#### Getting Data (API)
+
+Setup the database:
+
+```
+python bin/sqlachemy_base.py
+```
+
+Run with gunicorn
+
+```
+gunicorn bin.api:api
+```
+
+#### Front-end
+
+```
+cd web
+python -m SimpleHTTPServer 8003
 ```
 
 #### Development

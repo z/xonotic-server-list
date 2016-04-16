@@ -37,7 +37,7 @@ $(document).ready(function () {
   handleTabs();
 
   // Get the stats and filter them down.
-  $.get('resources/data/stats.json', function (response) {
+  $.get('http://127.0.0.1:8000/player_stats/', function (response) {
 
     var stats_data = response.data;
 
@@ -74,6 +74,20 @@ $(document).ready(function () {
       countryTypes[countryList[i]] = 'area-spline';
     }
 
+    var countryList2 = [
+      'CA',
+      'UA',
+      'US',
+      'FR',
+      'DE',
+      'AU',
+      'RU',
+      'GB',
+      'ZA',
+      'NL',
+      'CL'
+    ];
+
     countryTypes['total_players'] = 'line';
     countryTypes['moving_average'] = 'line';
 
@@ -89,6 +103,7 @@ $(document).ready(function () {
           value: xKeys,
           x: 'time'
         },
+        names: countryList2,
         types: countryTypes,
         groups: [countryList]
       },
