@@ -118,6 +118,24 @@ $(document).ready(function () {
       }
     });
 
+    $('#stacked-off').click(function() {
+      chart.groups([[]]);
+      $(this).addClass('active');
+      setTimeout(function() {
+        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.4);
+      }, 100);
+      $('#stacked-on').removeClass('active');
+    });
+
+    $('#stacked-on').click(function() {
+      chart.groups([countryList]);
+      $(this).addClass('active');
+      setTimeout(function() {
+        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7)
+      }, 100);
+      $('#stacked-off').removeClass('active');
+    });
+
   });
 
 });
