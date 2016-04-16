@@ -42,8 +42,13 @@ $(document).ready(function () {
     var stats_data = response.data;
 
     // Need to do this until: https://github.com/masayuki0812/c3/issues/1471
+    var acc = 0;
     function flattenCountries(element, index, array) {
+      var p1 = element.total_players;
+      acc += p1;
+      var moving_average = acc / (index + 1);
       element.time = element.time * 1000;
+      element.moving_average = moving_average;
       c3data.push(flatten(element));
     }
 
@@ -70,9 +75,11 @@ $(document).ready(function () {
     }
 
     countryTypes['total_players'] = 'line';
+    countryTypes['moving_average'] = 'line';
 
     var xKeys = countryList.slice();
     xKeys.push('total_players');
+    xKeys.push('moving_average');
 
     var chart = c3.generate({
       bindto: '#chart-players',
