@@ -6,3 +6,13 @@
     padding: 15px;
     margin-top: 26px;
 }
+
+.chart-wrapper {
+    text-align:right;
+}
+.chart-wrapper .timespan {
+    margin-bottom: 10px;
+}
+.c3-event-rects {
+    cursor: default !important;
+}

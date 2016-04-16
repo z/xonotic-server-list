@@ -50,43 +50,21 @@ $(document).ready(function () {
       element.time = element.time * 1000;
       element.moving_average = moving_average;
       c3data.push(flatten(element));
+      $.each(element.countries, function(index, value) {
+        allCountries.push('countries_' + index);
+      });
     }
 
     var c3data = [];
+    var allCountries = [];
     stats_data.forEach(flattenCountries);
 
-    var countryList = [
-      'countries_CA',
-      'countries_UA',
-      'countries_US',
-      'countries_FR',
-      'countries_DE',
-      'countries_AU',
-      'countries_RU',
-      'countries_GB',
-      'countries_ZA',
-      'countries_NL',
-      'countries_CL'
-    ];
+    var countryList = allCountries.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 
     var countryTypes = {};
     for (var i = 0; i < countryList.length; i++) {
       countryTypes[countryList[i]] = 'area-spline';
     }
-
-    var countryList2 = [
-      'CA',
-      'UA',
-      'US',
-      'FR',
-      'DE',
-      'AU',
-      'RU',
-      'GB',
-      'ZA',
-      'NL',
-      'CL'
-    ];
 
     countryTypes['total_players'] = 'line';
     countryTypes['moving_average'] = 'line';
@@ -103,7 +81,6 @@ $(document).ready(function () {
           value: xKeys,
           x: 'time'
         },
-        names: countryList2,
         types: countryTypes,
         groups: [countryList]
       },
@@ -117,6 +94,9 @@ $(document).ready(function () {
       },
       subchart: {
         show: true
+      },
+      zoom: {
+        enabled: true
       },
       point: {
         show: false
