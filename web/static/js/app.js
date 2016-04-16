@@ -48,7 +48,7 @@ $(document).ready(function () {
       acc += p1;
       var moving_average = acc / (index + 1);
       element.time = element.time * 1000;
-      element.moving_average = moving_average;
+      element.moving_average = moving_average.toFixed(2);
       c3data.push(flatten(element));
       $.each(element.countries, function(index, value) {
         allCountries.push('countries_' + index);
@@ -122,8 +122,8 @@ $(document).ready(function () {
       chart.groups([[]]);
       $(this).addClass('active');
       setTimeout(function() {
-        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.4);
-      }, 100);
+        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.3);
+      }, 350);
       $('#stacked-on').removeClass('active');
     });
 
@@ -132,9 +132,11 @@ $(document).ready(function () {
       $(this).addClass('active');
       setTimeout(function() {
         $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7)
-      }, 100);
+      }, 350);
       $('#stacked-off').removeClass('active');
     });
+
+    $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7)
 
   });
 
