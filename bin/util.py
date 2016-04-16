@@ -37,6 +37,13 @@ def check_if_not_create(file, template=None):
             fo.close()
 
 
+def int_or_false(value):
+    try:
+        return int(value)
+    except ValueError:
+        return False
+
+
 def api_request(url, format='json'):
 
     req = urllib.request.Request(url)

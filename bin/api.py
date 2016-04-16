@@ -26,11 +26,18 @@ class PlayerStatsResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
 
-        stats = session.query(Stats).all()
+        stats = session.query(Stats)
 
-        # stats = session.query(Stats) \
-        #     .filter_by(hour=13) \
-        #     .all()
+        if 'day' in req.params:
+            filter = int_or_false(req.params['day'])
+            if 0 <= filter <= 7:
+                print(filter)
+                stats = stats.filter_by(weekday=filter)
+
+        if 'hour' in req.params:
+            filter = int_or_false(req.params['hour'])
+            if 0 <= filter <= 24:
+                stats = stats.filter_by(hour=filter)
 
         data = []
         for row in stats:
