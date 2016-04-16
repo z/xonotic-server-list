@@ -16,6 +16,7 @@
 .c3-event-rects {
     cursor: default !important;
 }
+/* opacity during transiations */
 .c3-shape {
-    opacity: 0.3;
+    opacity: 0.2;
 }

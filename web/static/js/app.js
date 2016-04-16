@@ -103,7 +103,11 @@ $(document).ready(function () {
         x: {
           type: 'timeseries',
           tick: {
-            format: '%Y-%m-%d %H:%M'
+            // waiting on this https://github.com/masayuki0812/c3/pull/1400
+            culling: true,
+            max: 15,
+            //format: '%Y-%m-%d %H:%M',
+            format: '%H:%M%p'
           }
         }
       },
@@ -122,8 +126,8 @@ $(document).ready(function () {
       chart.groups([[]]);
       $(this).addClass('active');
       setTimeout(function() {
-        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.3);
-      }, 350);
+        $('.c3-shapes.c3-areas .c3-shape').animate({'opacity': 0.4}, 200);
+      }, 450);
       $('#stacked-on').removeClass('active');
     });
 
@@ -131,12 +135,12 @@ $(document).ready(function () {
       chart.groups([countryList]);
       $(this).addClass('active');
       setTimeout(function() {
-        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7)
-      }, 350);
+        $('.c3-shapes.c3-areas .c3-shape').animate({'opacity': 0.7}, 200);
+      }, 450);
       $('#stacked-off').removeClass('active');
     });
 
-    $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7)
+    $('#stacked-on').click();
 
   });
 
