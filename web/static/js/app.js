@@ -81,6 +81,21 @@ $(document).ready(function () {
           value: xKeys,
           x: 'time'
         },
+        colors: {
+          countries_CA: '#9e0142',
+          countries_UA: '#d53e4f',
+          countries_US: '#f46d43',
+          countries_FR: '#fdae61',
+          countries_DE: '#fee08b',
+          countries_AU: '#ffffbf',
+          countries_RU: '#e6f598',
+          countries_GB: '#abdda4',
+          countries_ZA: '#66c2a5',
+          countries_NL: '#3288bd',
+          countries_CL: '#5e4fa2',
+          total_players: '#0000cc',
+          moving_average: '#cc0000'
+        },
         types: countryTypes,
         groups: [countryList]
       },
