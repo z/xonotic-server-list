@@ -49,10 +49,11 @@ Print current stats to output:
 ./bin/players2json.py -o
 ```
 
-Write current stats to output (appends to file):
+Write current stats to output (appends to file or database):
 
 ```
-./bin/players2json.py -w
+./bin/players2json.py -w json
+./bin/players2json.py -w db
 ```
 
 

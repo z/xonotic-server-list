@@ -6,6 +6,14 @@ import time
 import argparse
 import locale
 import geoip2.database
+import calendar
+from datetime import datetime
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from sqlalchemy_base import Stats, Base
+
 from util import *
 
 locale.setlocale(locale.LC_ALL, '')
@@ -21,18 +29,39 @@ def main():
     total_players_pretty = locale.format("%d", total_players, grouping=True)
     total_bots_pretty = locale.format("%d", total_bots, grouping=True)
 
-    if args.verbose:
-        print('Total Players: ' + total_players_pretty)
-        print('Total Bots: ' + total_bots_pretty)
-
-    unixtime = int(time.time())
+    utc_time = datetime.utcnow()
+    unix_time = calendar.timegm(utc_time.utctimetuple())
 
     datapoint = {
-        'time': unixtime,
+        'time': unix_time,
         'total_players': total_players,
         'total_bots': total_bots,
         'countries': countries,
     }
+
+    if args.verbose:
+        print('Total Players: ' + total_players_pretty)
+        print('Total Bots: ' + total_bots_pretty)
+
+    if args.write == 'db':
+        engine = create_engine(config['stats_database'])
+        Base.metadata.bind = engine
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+
+        weekday = utc_time.weekday()
+        hour = utc_time.strftime("%H")
+
+        new_stats = Stats(
+            countries=countries,
+            total_players=total_players,
+            total_bots=total_bots,
+            moving_average=0,
+            hour=hour,
+            weekday=weekday
+        )
+        session.add(new_stats)
+        session.commit()
 
     stats_json_file = config['stats_file']
 
@@ -54,7 +83,7 @@ def main():
         else:
             print(json.dumps(datapoint))
 
-    if args.write:
+    if args.write == 'json':
         write_to_json(output, config['stats_file'])
 
 
@@ -114,8 +143,7 @@ def parse_args():
     parser.add_argument('--output', '-o', action='store_true', help='Output JSON to stdout')
     parser.add_argument('--all', '-a', action='store_true', help='Output all stats JSON to stdout')
     parser.add_argument('--verbose', '-v', action='store_true', help='Pretty during processing stats to stdout')
-    parser.add_argument('--write', '-w', action='store_true', help='Write JSON to file defined in config.ini')
-
+    parser.add_argument('--write', '-w', nargs='?', help='Write to JSON file or database defined in config.ini. Options: (db|json)')
     return parser.parse_args()
 
 
