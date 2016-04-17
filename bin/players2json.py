@@ -54,16 +54,16 @@ def main():
         weekday = utc_time.weekday()
         hour = utc_time.strftime("%H")
 
-        # new_stats = Stats(
-        #     countries=countries,
-        #     total_players=total_players,
-        #     total_bots=total_bots,
-        #     moving_average=0,
-        #     hour=hour,
-        #     weekday=weekday
-        # )
-        # session.add(new_stats)
-        # session.commit()
+        new_stats = Stats(
+            countries=countries,
+            total_players=total_players,
+            total_bots=total_bots,
+            moving_average=0,
+            hour=hour,
+            weekday=weekday
+        )
+        session.add(new_stats)
+        session.commit()
 
         if 'server' in xonotic_status['qstat']:
             for server in xonotic_status['qstat']['server']:
