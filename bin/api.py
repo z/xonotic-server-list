@@ -1,11 +1,16 @@
 import falcon
 import json
 import calendar
+import os
 from falcon_cors import CORS
 from datetime import datetime
-from bin.sqlalchemy_base import Stats, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(root_dir)
+
+from bin.sqlalchemy_base import Stats, Base
 from bin.util import *
 
 
@@ -31,13 +36,14 @@ class PlayerStatsResource:
         if 'day' in req.params:
             filter = int_or_false(req.params['day'])
             if 0 <= filter <= 7:
-                print(filter)
                 stats = stats.filter_by(weekday=filter)
 
         if 'hour' in req.params:
             filter = int_or_false(req.params['hour'])
             if 0 <= filter <= 24:
                 stats = stats.filter_by(hour=filter)
+
+        stats = stats.limit(288)
 
         data = []
         for row in stats:
@@ -50,7 +56,7 @@ class PlayerStatsResource:
         resp.body = json.dumps(json_out)
 
 
-config = read_config('config/config.ini')
+config = read_config(root_dir + '/config/config.ini')
 
 engine = create_engine(config['stats_database'])
 Base.metadata.bind = engine
@@ -60,5 +66,5 @@ DBSession.bind = engine
 session = DBSession()
 
 cors = CORS(allow_origins_list=[config['frontend_url']])
-api = falcon.API(middleware=[cors.middleware])
+api = application = falcon.API(middleware=[cors.middleware])
 api.add_route('/player_stats', PlayerStatsResource())

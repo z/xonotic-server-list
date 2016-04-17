@@ -107,7 +107,7 @@ $(document).ready(function () {
             culling: true,
             max: 15,
             //format: '%Y-%m-%d %H:%M',
-            format: '%H:%M%p'
+            format: '%I:%M%p'
           }
         }
       },
