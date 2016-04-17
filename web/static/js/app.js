@@ -35,6 +35,7 @@ $(document).ready(function () {
   }
 
   handleTabs();
+  var p = new Ping();
 
   var table = $('#table-serverlist').DataTable({
     ajax: GLOBAL.api_url + '/server_list',
@@ -88,7 +89,7 @@ $(document).ready(function () {
         data: 'version'
       },      
       {
-        data: 'ping'
+        defaultContent: 'unknown'
       }
     ],
     columnDefs: [
@@ -110,6 +111,12 @@ $(document).ready(function () {
         type: 'natural',
         render: function (data, type, full, meta) {
           return data.total_players + '/' + data.max_players;
+        }
+      },
+      { // ping
+        targets: 9,
+        render: function (data, type, full, meta) {
+          return data;
         }
       }
     ],
@@ -143,8 +150,65 @@ $(document).ready(function () {
     },
     drawCallback: function (settings) {
       $('#table-controls').show();
+
+      setTimeout(function() {
+        refreshPings();
+      }, 1000);
     }
   });
+
+
+  function refreshPings() {
+    var tableApi = $('#table-serverlist').DataTable();
+
+    var addresses = tableApi
+      .columns(3)
+      .data()
+      .eq(0)
+      .sort();
+
+    var ips = [];
+    $.each(addresses, function(index, data) {
+      ips.push(data.split(':')[0]);
+    });
+
+    var ipsFiltered = ips.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+
+    var i = 0;
+
+    function pingServer(ipsFiltered) {
+
+      var ip = ipsFiltered.pop();
+
+      if (i < 150) {
+
+        p.ping('http://' + ip, function (ping) {
+
+          var dd = tableApi
+            .rows()
+            .eq(0)
+            .each(function(index) {
+              i++;
+              var row = tableApi.row( index );
+
+              if ( row.data().address.indexOf(ip) > -1 ) {
+                tableApi.cell( index, 9 ).data(ping);
+              }
+
+              //setTimeout(pingServer(ipsFiltered), 2000);
+              pingServer(ipsFiltered);
+
+            });
+
+        }, 5000);
+
+      }
+
+    }
+
+    pingServer(ipsFiltered);
+
+  }
 
   // Get the stats and filter them down.
   $.get(GLOBAL.api_url + '/player_stats/', function (response) {
