@@ -37,7 +37,7 @@ $(document).ready(function () {
   handleTabs();
 
   var table = $('#table-serverlist').DataTable({
-    ajax: 'http://127.0.0.1:8000/server_list',
+    ajax: GLOBAL.api_url + '/server_list',
     lengthMenu: [25, 50, 100, 250],
     pageLength: 25,
     order: [[2, 'desc']],    
@@ -127,7 +127,7 @@ $(document).ready(function () {
   });
 
   // Get the stats and filter them down.
-  $.get('http://127.0.0.1:8000/player_stats/', function (response) {
+  $.get(GLOBAL.api_url + '/player_stats/', function (response) {
 
     var stats_data = response.data;
 

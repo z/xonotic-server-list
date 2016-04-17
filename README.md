@@ -98,9 +98,20 @@ gunicorn bin.api:api
 
 ## Front-end
 
-Everything in the `web` folder is static content without a dynamic server-side language. This can be served with nginx for example. 
+Everything in the `web` folder is static content without a dynamic server-side language. This can be served with nginx for example.
+
+### Configuration
+
+Copy the example config file:
+
+```
+cd web
+cp static/js/example.config.js static/js/config.js
+```
 
 ### Usage
+
+Development:
 
 ```
 cd web

@@ -2,6 +2,7 @@
 *.swp
 *.swo
 config.ini
+config.js
 venv
 activate
 __pycache__
