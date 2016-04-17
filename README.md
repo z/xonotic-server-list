@@ -2,10 +2,6 @@
 
 Provide server list front-end and display player count stats over time.
 
-## Frontend
-
-Coming soon.
-
 ## Backend/Middleware
 
 The heavy lifting is handled by code that acts as middleware between the
@@ -100,7 +96,11 @@ Run with gunicorn
 gunicorn bin.api:api
 ```
 
-#### Front-end
+## Front-end
+
+Everything in the `web` folder is static content without a dynamic server-side language. This can be served with nginx for example. 
+
+### Usage
 
 ```
 cd web
