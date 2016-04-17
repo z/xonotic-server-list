@@ -159,6 +159,14 @@ $(document).ready(function () {
     countryTypes['total_players'] = 'line';
     countryTypes['moving_average'] = 'line';
 
+    var countryNames = {};
+    for (var i = 0; i < countryList.length; i++) {
+      countryNames[countryList[i]] = countryList[i].replace('countries_', '');
+    }
+
+    countryNames['total_players'] = 'Total Players';
+    countryNames['moving_average'] = 'Moving Average';
+
     var xKeys = countryList.slice().sort();
     xKeys.push('total_players');
     xKeys.push('moving_average');
@@ -212,6 +220,7 @@ $(document).ready(function () {
         show: false
       },
       onrendered: function () {
+        // Mostly c3 hacks
         if ($('#stacked-on').hasClass('active')) {
           $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7);
         } else {
@@ -219,6 +228,9 @@ $(document).ready(function () {
         }
       }
     });
+
+    // Apply the names via the API
+    chart.data.names(countryNames);
 
     $('#stacked-off').click(function() {
       chart.groups([[]]);
