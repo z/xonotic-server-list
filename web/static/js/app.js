@@ -120,6 +120,13 @@ $(document).ready(function () {
       },
       point: {
         show: false
+      },
+      onrendered: function () {
+        if ($('#stacked-on').hasClass('active')) {
+          $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7);
+        } else {
+          $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.4);
+        }
       }
     });
 
