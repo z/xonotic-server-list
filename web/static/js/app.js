@@ -69,13 +69,14 @@ $(document).ready(function () {
     countryTypes['total_players'] = 'line';
     countryTypes['moving_average'] = 'line';
 
-    var xKeys = countryList.slice();
+    var xKeys = countryList.slice().sort();
     xKeys.push('total_players');
     xKeys.push('moving_average');
 
     var chart = c3.generate({
       bindto: '#chart-players',
       data: {
+        order: null,
         json: c3data,
         keys: {
           value: xKeys,
@@ -83,16 +84,16 @@ $(document).ready(function () {
         },
         colors: {
           countries_CA: '#9e0142',
-          countries_UA: '#d53e4f',
-          countries_US: '#f46d43',
+          countries_CL: '#d53e4f',
+          countries_DE: '#f46d43',
           countries_FR: '#fdae61',
-          countries_DE: '#fee08b',
-          countries_AU: '#ffffbf',
+          countries_GB: '#fee08b',
+          countries_NL: '#ffffbf',
           countries_RU: '#e6f598',
-          countries_GB: '#abdda4',
-          countries_ZA: '#66c2a5',
-          countries_NL: '#3288bd',
-          countries_CL: '#5e4fa2',
+          countries_UA: '#abdda4',
+          countries_US: '#66c2a5',
+          countries_ZA: '#3288bd',
+          countries_ES: '#5e4fa2',
           total_players: '#0000cc',
           moving_average: '#cc0000'
         },
