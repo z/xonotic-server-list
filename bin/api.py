@@ -80,12 +80,16 @@ class ServerListResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
 
+#        servers = session.query(Servers)
+
         last = session.query(Servers).order_by(Servers.period.desc()).first()
+
+        print(last.period)
 
         servers = session.query(Servers)
 
         if last:
-            servers.filter_by(period=last.period)
+            servers = servers.filter_by(period=last.period)
 
         servers = servers.order_by(desc(Servers.total_players)).limit(200)
 

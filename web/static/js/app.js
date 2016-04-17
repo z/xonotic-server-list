@@ -224,6 +224,10 @@ $(document).ready(function () {
 
   });
 
+  // Need to hide datatables when changing tabs for fixedHeader
+  var visible = true;
+  var tableContainer = $(table.table().container());
+
   $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 
     var currentTab = $('.nav li.active a').attr('href');
