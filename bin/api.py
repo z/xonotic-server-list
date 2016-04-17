@@ -6,7 +6,7 @@ from falcon_cors import CORS
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, func
 
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(root_dir)
@@ -78,9 +78,13 @@ class ServerListResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
 
-        servers = session.query(Servers)
+#        servers = session.query(Servers)
 
-        servers = servers.order_by(asc(Servers.ping)).limit(200)
+        last = session.query(Servers).order_by(Servers.period.desc()).first()
+
+        servers = session.query(Servers).filter_by(period=last.period)
+
+        servers = servers.order_by(desc(Servers.total_players)).limit(200)
 
         data = []
         for row in servers:

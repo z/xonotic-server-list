@@ -66,6 +66,13 @@ def main():
         session.commit()
 
         if 'server' in xonotic_status['qstat']:
+
+            last = session.query(Servers).order_by(Servers.period.desc()).first()
+            if last:
+                last_period = last.period + 1
+            else:
+                last_period = 0
+
             for server in xonotic_status['qstat']['server']:
                 if 'numplayers' in server:
 
@@ -83,6 +90,7 @@ def main():
 
 
                     new_server = Servers(
+                        period=last_period,
                         name=server_name,
                         address=server_address,
                         total_players=server_total_players,

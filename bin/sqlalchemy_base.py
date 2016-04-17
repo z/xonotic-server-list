@@ -50,6 +50,7 @@ class Servers(Base):
 
     id = Column(Integer, primary_key=True)
     time = Column(DateTime, default=datetime.datetime.utcnow)
+    period = Column(Integer)
     name = Column(String)
     address = Column(String)
     total_players = Column(Integer)

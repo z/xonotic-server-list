@@ -36,6 +36,78 @@ $(document).ready(function () {
 
   handleTabs();
 
+  var table = $('#table-serverlist').DataTable({
+    ajax: 'http://127.0.0.1:8000/server_list',
+    lengthMenu: [25, 50, 100, 250],
+    pageLength: 25,
+    fixedHeader: {
+      header: true,
+      headerOffset: $('#main-nav').height()
+    },
+    processing: true,
+    deferRender: true,
+    language: {
+      search: "",
+      lengthMenu: '_MENU_'
+    },
+    dom: "<'#table-controls'lf>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row footer-bar navbar-inverse'<'col-sm-5 navbar-brand'i><'col-sm-7'p>>",
+    columns: [
+      {
+        data: 'name'
+      },
+      {
+        data: 'address'
+      },
+      {
+        data: 'total_players'
+      },
+      {
+        data: 'max_players'
+      },
+      {
+        data: 'map'
+      },
+      {
+        data: 'gametype'
+      },
+      {
+        data: 'ping'
+      }
+    ],
+    initComplete: function (settings, json) {
+
+      // Make the search more better ;)
+      $('#table-serverlist_filter')
+        .addClass('pull-right')
+        .css('position', 'relative')
+        .append('<span id="search-clear" class="fa fa-times-circle-o hidden"></span>');
+      $('#search-clear').click(function (e) {
+        $('#table-serverlist_filter input').val('');
+        table.search('').draw();
+      });
+
+      // Put the controls in the navbar
+      $('#table-controls').detach().appendTo('#nav-table-controls');
+
+      // Style and show
+      $('#table-serverlist_length').addClass('pull-right');
+      $('#table-controls .btn').addClass('btn-sm');
+      $('#table-controls .dt-buttons').addClass('pull-right');
+      $('#table-controls').show();
+
+      var searchTerm = $('#table-serverlist_filter input').val();
+      if (searchTerm) {
+        $('#search-clear').removeClass('hidden');
+      }
+
+    },
+    drawCallback: function (settings) {
+      $('#table-controls').show();
+    }
+  });
+
   // Get the stats and filter them down.
   $.get('http://127.0.0.1:8000/player_stats/', function (response) {
 
@@ -150,6 +222,48 @@ $(document).ready(function () {
 
     $('#stacked-on').click();
 
+  });
+
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+    var currentTab = $('.nav li.active a').attr('href');
+
+    switch (currentTab) {
+
+      case "#serverlist":
+
+        visible = false;
+
+        break;
+
+      case "#statistics":
+
+      case "#about":
+
+      default:
+
+        visible = false;
+
+    }
+
+    $('#nav-table-controls').hide();
+
+    table.fixedHeader.adjust();
+    hideCharts();
+
+    // decide whether to show the table or not
+    if (visible) { // hide table
+      tableContainer.css('display', 'none');
+    } else { // show table
+      tableContainer.css('display', 'block');
+    }
+
+  });
+
+  $('[href=#serverlist]').click(function() {
+    setTimeout(function() {
+      $('#nav-table-controls').show();
+    }, 10);
   });
 
 });

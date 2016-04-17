@@ -62,7 +62,20 @@
                 <div class="panel">
                     <div class="panel-body">
 
-                        <h2>Server list coming soon...</h2>
+                        <table id="table-serverlist" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>name</th>
+                                    <th>address</th>
+                                    <th>total players</th>
+                                    <th>max players</th>
+                                    <th>map</th>
+                                    <th>gametype</th>
+                                    <th>ping</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
 
                     </div><!-- .panel-body -->
                 </div><!-- .panel -->
@@ -79,20 +92,20 @@
 
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <h3 class="text-center">Active Players</h3>
+                                    <h3 class="text-center">Active Players (last 24 hours)</h3>
                                     <div class="chart-wrapper">
 
                                         <div class="btn-group timespan" role="group" aria-label="...">
                                           <button id="stacked-on" type="button" class="btn btn-default active">Stacked</button>
                                           <button id="stacked-off" type="button" class="btn btn-default">Unstacked</button>
                                         </div>
-
+<!--
                                         <div class="btn-group timespan" role="group" aria-label="...">
                                           <button type="button" class="btn btn-default">Month</button>
                                           <button type="button" class="btn btn-default">Week</button>
                                           <button type="button" class="btn btn-default active">Day</button>
                                         </div>
-
+-->
                                         <div id="chart-players"></div>
                                     </div>
                                 </div>
