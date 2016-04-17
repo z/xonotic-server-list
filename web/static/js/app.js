@@ -39,8 +39,8 @@ $(document).ready(function () {
   var table = $('#table-serverlist').DataTable({
     ajax: GLOBAL.api_url + '/server_list',
     lengthMenu: [25, 50, 100, 250],
-    pageLength: 25,
-    order: [[2, 'desc']],    
+    pageLength: 50,
+    order: [[4, 'desc']],
     fixedHeader: {
       header: true,
       headerOffset: $('#main-nav').height()
@@ -55,6 +55,12 @@ $(document).ready(function () {
             "<'row'<'col-sm-12'tr>>" +
             "<'row footer-bar navbar-inverse'<'col-sm-5 navbar-brand'i><'col-sm-7'p>>",
     columns: [
+      {
+        data: 'country'
+      },
+      {
+        data: 'country'
+      },
       {
         data: 'name'
       },
@@ -86,8 +92,21 @@ $(document).ready(function () {
       }
     ],
     columnDefs: [
+      { // country
+        targets: 0,
+        orderData: 1,
+        render: function (data, type, full, meta) {
+          var cc = data.toLowerCase();
+          return '<span class="flag-icon flag-icon-' + cc + '" title="' + cc + '"></span>';
+        }
+      },
+      { // country (lookup)
+        targets: 1,
+        visible: false,
+        searchable: false
+      },
       { // players
-        targets: 2,
+        targets: 4,
         type: 'natural',
         render: function (data, type, full, meta) {
           return data.total_players + '/' + data.max_players;
@@ -101,6 +120,7 @@ $(document).ready(function () {
         .addClass('pull-right')
         .css('position', 'relative')
         .append('<span id="search-clear" class="fa fa-times-circle-o hidden"></span>');
+
       $('#search-clear').click(function (e) {
         $('#table-serverlist_filter input').val('');
         table.search('').draw();
@@ -180,6 +200,7 @@ $(document).ready(function () {
           value: xKeys,
           x: 'time'
         },
+        names: countryNames,
         colors: {
           countries_CA: '#9e0142',
           countries_CL: '#d53e4f',
@@ -228,9 +249,6 @@ $(document).ready(function () {
         }
       }
     });
-
-    // Apply the names via the API
-    chart.data.names(countryNames);
 
     $('#stacked-off').click(function() {
       chart.groups([[]]);

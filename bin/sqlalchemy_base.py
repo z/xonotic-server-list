@@ -54,6 +54,7 @@ class Servers(Base):
     key = Column(String)
     name = Column(String)
     address = Column(String)
+    country = Column(String)
     total_players = Column(Integer)
     max_players = Column(Integer)
     map = Column(String)

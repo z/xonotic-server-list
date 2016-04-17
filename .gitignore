@@ -8,3 +8,4 @@ activate
 __pycache__
 stats.json
 stats.db
+cron.sh

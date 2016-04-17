@@ -67,6 +67,8 @@ def main():
 
         if 'server' in xonotic_status['qstat']:
 
+            reader = geoip2.database.Reader(config['ip_location_db'])
+
             last = session.query(Servers).order_by(Servers.period.desc()).first()
             if last:
                 last_period = last.period + 1
@@ -78,10 +80,15 @@ def main():
 
                     server_name = server['name']
                     server_address = server['@address']
+                    server_ip = server['@address'].split(':')[0]
                     server_total_players = int(server['numplayers'])
                     server_max_players = int(server['maxplayers'])
                     server_ping = int(server['ping'])
                     server_map = server['map']
+
+                    if is_valid_ip(server_ip):
+                        response = reader.country(server_ip)
+                        server_country = response.country.iso_code
 
                     if 'rules' in server:
                         for rule in server['rules']['rule']:
@@ -100,6 +107,7 @@ def main():
                         key=server_key,
                         name=server_name,
                         address=server_address,
+                        country=server_country,
                         total_players=server_total_players,
                         max_players=server_max_players,
                         ping=server_ping,

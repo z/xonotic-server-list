@@ -35,6 +35,7 @@ def row2serverlist(row):
         'time': unix_time,
         'name': row.name,
         'address': row.address,
+        'country': row.country,
         'total_players': row.total_players,
         'max_players': row.max_players,
         'map': row.map,

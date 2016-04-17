@@ -70,6 +70,10 @@ table.dataTable.fixedHeader-locked {
     font-size: 14px;
 }
 
+.flag-icon {
+    overflow:hidden
+}
+
 .chart-wrapper {
     text-align:right;
 }
