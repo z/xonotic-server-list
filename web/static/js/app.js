@@ -40,6 +40,7 @@ $(document).ready(function () {
     ajax: 'http://127.0.0.1:8000/server_list',
     lengthMenu: [25, 50, 100, 250],
     pageLength: 25,
+    order: [[2, 'desc']],    
     fixedHeader: {
       header: true,
       headerOffset: $('#main-nav').height()
@@ -87,6 +88,7 @@ $(document).ready(function () {
     columnDefs: [
       { // players
         targets: 2,
+        type: 'natural',
         render: function (data, type, full, meta) {
           return data.total_players + '/' + data.max_players;
         }
