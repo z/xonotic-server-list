@@ -80,11 +80,7 @@ class ServerListResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
 
-#        servers = session.query(Servers)
-
         last = session.query(Servers).order_by(Servers.period.desc()).first()
-
-        print(last.period)
 
         servers = session.query(Servers)
 
