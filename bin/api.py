@@ -44,7 +44,7 @@ class PlayerStatsResource:
             if 0 <= filter <= 24:
                 stats = stats.filter_by(hour=filter)
 
-        stats = stats.order_by(desc(Stats.id)).limit(280)
+        stats = stats.order_by(desc(Stats.id)).limit(288)
 
         data = []
         for row in stats:

@@ -45,5 +45,18 @@ class Stats(Base):
     moving_average = Column(Float)
 
 
+class Servers(Base):
+    __tablename__ = 'servers'
+
+    id = Column(Integer, primary_key=True)
+    time = Column(DateTime, default=datetime.datetime.utcnow)
+    name = Column(String)
+    address = Column(String)
+    total_players = Column(Integer)
+    max_players = Column(Integer)
+    map = Column(String)
+    gametype = Column(String)
+    ping = Column(Integer)
+
 engine = create_engine('sqlite:///resources/data/stats.db')
 Base.metadata.create_all(engine)

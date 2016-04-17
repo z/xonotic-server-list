@@ -12,7 +12,7 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from sqlalchemy_base import Stats, Base
+from sqlalchemy_base import Stats, Servers, Base
 
 from util import *
 
@@ -24,7 +24,9 @@ def main():
     args = parse_args()
     config = read_config('config/config.ini')
 
-    total_players, total_bots, countries = get_player_counts(config, args)
+    xonotic_status = get_master_server(config['master_server'], 'xonotic')
+
+    total_players, total_bots, countries = get_player_counts(xonotic_status, config, args)
 
     total_players_pretty = locale.format("%d", total_players, grouping=True)
     total_bots_pretty = locale.format("%d", total_bots, grouping=True)
@@ -52,16 +54,45 @@ def main():
         weekday = utc_time.weekday()
         hour = utc_time.strftime("%H")
 
-        new_stats = Stats(
-            countries=countries,
-            total_players=total_players,
-            total_bots=total_bots,
-            moving_average=0,
-            hour=hour,
-            weekday=weekday
-        )
-        session.add(new_stats)
-        session.commit()
+        # new_stats = Stats(
+        #     countries=countries,
+        #     total_players=total_players,
+        #     total_bots=total_bots,
+        #     moving_average=0,
+        #     hour=hour,
+        #     weekday=weekday
+        # )
+        # session.add(new_stats)
+        # session.commit()
+
+        if 'server' in xonotic_status['qstat']:
+            for server in xonotic_status['qstat']['server']:
+                if 'numplayers' in server:
+
+                    server_name = server['name']
+                    server_address = server['@address']
+                    server_total_players = int(server['numplayers'])
+                    server_max_players = int(server['maxplayers'])
+                    server_ping = int(server['ping'])
+                    server_map = server['map']
+
+                    if 'rules' in server:
+                        for rule in server['rules']['rule']:
+                            if rule['@name'] == 'qcstatus':
+                                server_gametype = rule['#text'].split(':')[0]
+
+
+                    new_server = Servers(
+                        name=server_name,
+                        address=server_address,
+                        total_players=server_total_players,
+                        max_players=server_max_players,
+                        ping=server_ping,
+                        map=server_map,
+                        gametype=server_gametype,
+                    )
+                    session.add(new_server)
+                    session.commit()
 
     stats_json_file = config['stats_file']
 
@@ -87,18 +118,16 @@ def main():
         write_to_json(output, config['stats_file'])
 
 
-def get_player_counts(config, args):
+def get_player_counts(data, config, args):
 
     reader = geoip2.database.Reader(config['ip_location_db'])
-
-    xonotic_status = get_master_server(config['master_server'], 'xonotic')
 
     total_players = 0
     total_bots = 0
     countries = {}
 
-    if 'server' in xonotic_status['qstat']:
-        for server in xonotic_status['qstat']['server']:
+    if 'server' in data['qstat']:
+        for server in data['qstat']['server']:
             if 'numplayers' in server:
 
                 server_players = int(server['numplayers'])
