@@ -249,7 +249,6 @@ $(document).ready(function () {
     $('#nav-table-controls').hide();
 
     table.fixedHeader.adjust();
-    hideCharts();
 
     // decide whether to show the table or not
     if (visible) { // hide table
