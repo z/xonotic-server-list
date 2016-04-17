@@ -85,12 +85,21 @@ def main():
 
                     if 'rules' in server:
                         for rule in server['rules']['rule']:
+
                             if rule['@name'] == 'qcstatus':
                                 server_gametype = rule['#text'].split(':')[0]
+                                server_modname = rule['#text'].split(':')[5].lstrip('M')
+                                server_qcstatus = rule['#text']
 
+                            if rule['@name'] == 'd0_blind_id':
+                                server_key = rule['#text']
+
+                            if rule['@name'] == 'gameversion':
+                                server_version = '.'.join(list(rule['#text']))
 
                     new_server = Servers(
                         period=last_period,
+                        key=server_key,
                         name=server_name,
                         address=server_address,
                         total_players=server_total_players,
@@ -98,6 +107,9 @@ def main():
                         ping=server_ping,
                         map=server_map,
                         gametype=server_gametype,
+                        modname=server_modname,
+                        version=server_version,
+                        qcstatus=server_qcstatus
                     )
                     session.add(new_server)
                     session.commit()

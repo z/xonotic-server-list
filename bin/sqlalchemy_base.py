@@ -51,6 +51,7 @@ class Servers(Base):
     id = Column(Integer, primary_key=True)
     time = Column(DateTime, default=datetime.datetime.utcnow)
     period = Column(Integer)
+    key = Column(String)
     name = Column(String)
     address = Column(String)
     total_players = Column(Integer)
@@ -58,6 +59,10 @@ class Servers(Base):
     map = Column(String)
     gametype = Column(String)
     ping = Column(Integer)
+    modname = Column(String)
+    version = Column(String)
+    qcstatus = Column(String)
+    players = Column(String)
 
 engine = create_engine('sqlite:///resources/data/stats.db')
 Base.metadata.create_all(engine)
