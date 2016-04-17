@@ -6,6 +6,7 @@ from falcon_cors import CORS
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import desc
 
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(root_dir)
@@ -43,7 +44,7 @@ class PlayerStatsResource:
             if 0 <= filter <= 24:
                 stats = stats.filter_by(hour=filter)
 
-        stats = stats.limit(288)
+        stats = stats.order_by(desc(Stats.id)).limit(280)
 
         data = []
         for row in stats:
