@@ -60,11 +60,16 @@ $(document).ready(function () {
       {
         data: 'address'
       },
-      {
-        data: 'total_players'
+      { // players
+        data: function (row, type, val, meta) {
+          return {
+            'total_players': row.total_players,
+            'max_players': row.max_players
+          };
+        }
       },
       {
-        data: 'max_players'
+        data: 'modname'
       },
       {
         data: 'map'
@@ -73,7 +78,18 @@ $(document).ready(function () {
         data: 'gametype'
       },
       {
+        data: 'version'
+      },      
+      {
         data: 'ping'
+      }
+    ],
+    columnDefs: [
+      { // players
+        targets: 2,
+        render: function (data, type, full, meta) {
+          return data.total_players + '/' + data.max_players;
+        }
       }
     ],
     initComplete: function (settings, json) {

@@ -88,14 +88,12 @@ def main():
 
                             if rule['@name'] == 'qcstatus':
                                 server_gametype = rule['#text'].split(':')[0]
+                                server_version = rule['#text'].split(':')[1]
                                 server_modname = rule['#text'].split(':')[5].lstrip('M')
                                 server_qcstatus = rule['#text']
 
                             if rule['@name'] == 'd0_blind_id':
                                 server_key = rule['#text']
-
-                            if rule['@name'] == 'gameversion':
-                                server_version = '.'.join(list(rule['#text']))
 
                     new_server = Servers(
                         period=last_period,
