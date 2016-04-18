@@ -115,6 +115,7 @@ $(document).ready(function () {
       },
       { // ping
         targets: 9,
+        type: 'natural',
         render: function (data, type, full, meta) {
           return data;
         }
@@ -147,13 +148,13 @@ $(document).ready(function () {
         $('#search-clear').removeClass('hidden');
       }
 
+      setTimeout(function() {
+        refreshPings();
+      }, 1000);
     },
     drawCallback: function (settings) {
       $('#table-controls').show();
 
-      setTimeout(function() {
-        refreshPings();
-      }, 1000);
     }
   });
 
@@ -164,8 +165,7 @@ $(document).ready(function () {
     var addresses = tableApi
       .columns(3)
       .data()
-      .eq(0)
-      .sort();
+      .eq(0);
 
     var ips = [];
     $.each(addresses, function(index, data) {
@@ -175,38 +175,48 @@ $(document).ready(function () {
     var ipsFiltered = ips.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 
     var i = 0;
-
-    function pingServer(ipsFiltered) {
+    var timeoutSpeed = 10;
+    var ipsLength = ipsFiltered.length;
+   
+    function pingServer(ipsFiltered, timeoutSpeed) {
 
       var ip = ipsFiltered.pop();
 
-      if (i < 150) {
+      if (i < ipsLength) {
 
-        p.ping('http://' + ip, function (ping) {
+        setTimeout(function() {
 
-          var dd = tableApi
-            .rows()
-            .eq(0)
-            .each(function(index) {
-              i++;
-              var row = tableApi.row( index );
+          p.ping('http://' + ip, function (ping) {
 
-              if ( row.data().address.indexOf(ip) > -1 ) {
-                tableApi.cell( index, 9 ).data(ping);
-              }
+            var dd = tableApi
+              .rows()
+              .eq(0)
+              .each(function(index) {
+                var row = tableApi.row( index );
 
-              //setTimeout(pingServer(ipsFiltered), 2000);
-              pingServer(ipsFiltered);
+                if ( row.data().address.indexOf(ip) > -1 ) {
+                  tableApi.cell(index, 9).data(ping);
+                }
 
-            });
+              });
 
-        }, 5000);
+          }, 5000); // ping
 
-      }
+          i++;
+          timeoutSpeed = timeoutSpeed + 10;
 
-    }
+          //console.log(timeoutSpeed);
+          console.log('i: ' + i);
 
-    pingServer(ipsFiltered);
+          pingServer(ipsFiltered, timeoutSpeed);
+
+        }, timeoutSpeed); // setTimeout
+
+      } // if
+
+    } // ping server
+
+    pingServer(ipsFiltered, timeoutSpeed);
 
   }
 
