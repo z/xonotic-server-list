@@ -116,7 +116,7 @@ $(document).ready(function () {
         targets: 9,
         visible: false,
         searchable: false
-      },
+      }
     ],
     initComplete: function (settings, json) {
 
