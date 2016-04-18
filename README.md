@@ -63,7 +63,24 @@ See help for additional options:
 ./bin/players2json.py -h
 ```
 
-The generated json is an array of objects padded by a `data` object.
+#### Getting Data (API)
+
+Setup the database:
+
+```
+python bin/sqlachemy_base.py
+```
+
+Run with gunicorn
+
+```
+gunicorn bin.api:api
+```
+
+#### Endpoints
+
+
+###### /player_stats
 
 ```json
 {
@@ -82,18 +99,27 @@ The generated json is an array of objects padded by a `data` object.
 }
 ```
 
-#### Getting Data (API)
-
-Setup the database:
+###### /server_list
 
 ```
-python bin/sqlachemy_base.py
-```
-
-Run with gunicorn
-
-```
-gunicorn bin.api:api
+{
+    "data": [
+        {
+            "max_players": 20,
+            "country": "FR",
+            "ping": 121,
+            "time": 1460939412,
+            "gametype": "dm",
+            "map": "q3dm17ish",
+            "name": "Jeff &amp; Julius Resurrection Server",
+            "modname": "NewToys",
+            "address": "91.121.112.160:26015",
+            "total_players": 4,
+            "version": "git"
+        },
+        …
+    ]
+}        
 ```
 
 ## Front-end
@@ -118,7 +144,7 @@ cd web
 python -m SimpleHTTPServer 8003
 ```
 
-#### Development
+## Development
 
 The object looks similar to the example below:
 
@@ -159,7 +185,7 @@ The object looks similar to the example below:
  'players': None}
 ```
 
-#### Attribution
+## Attribution
 
 This software includes GeoLite2 data created by MaxMind, available from
 [maxmind.com](http://www.maxmind.com).
