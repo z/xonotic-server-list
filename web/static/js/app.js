@@ -41,7 +41,7 @@ $(document).ready(function () {
     ajax: GLOBAL.api_url + '/server_list',
     lengthMenu: [25, 50, 100, 250],
     pageLength: 50,
-    order: [[4, 'desc']],
+    order: [[4, 'desc'], [9, 'asc']],
     fixedHeader: {
       header: true,
       headerOffset: $('#main-nav').height()
@@ -174,9 +174,13 @@ $(document).ready(function () {
 
     var ipsFiltered = ips.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 
+    console.log(ipsFiltered)
+
     var i = 0;
     var timeoutSpeed = 10;
     var ipsLength = ipsFiltered.length;
+
+    ipsFiltered = ipsFiltered.reverse();
    
     function pingServer(ipsFiltered, timeoutSpeed) {
 
@@ -202,12 +206,14 @@ $(document).ready(function () {
 
           }, 5000); // ping
 
+          table
+              .column( 9 )
+              .order( 'asc' )
+              .draw();
+
           i++;
           timeoutSpeed = timeoutSpeed + 10;
-
-          //console.log(timeoutSpeed);
-          console.log('i: ' + i);
-
+          
           pingServer(ipsFiltered, timeoutSpeed);
 
         }, timeoutSpeed); // setTimeout
