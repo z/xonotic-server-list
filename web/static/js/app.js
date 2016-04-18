@@ -111,7 +111,12 @@ $(document).ready(function () {
         render: function (data, type, full, meta) {
           return data.total_players + '/' + data.max_players;
         }
-      }
+      },
+      { // ping
+        targets: 9,
+        visible: false,
+        searchable: false
+      },
     ],
     initComplete: function (settings, json) {
 
@@ -145,6 +150,9 @@ $(document).ready(function () {
       $('#table-controls').show();
     }
   });
+
+  // To be shown by initComplete
+  $('#table-controls').hide();
 
   // Get the stats and filter them down.
   $.get(GLOBAL.api_url + '/player_stats/', function (response) {
