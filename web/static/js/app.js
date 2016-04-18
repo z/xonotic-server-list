@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+  var sortIt = true;
+
   function flatten(obj, includePrototype, into, prefix) {
     into = into || {};
     prefix = prefix || "";
@@ -36,6 +38,8 @@ $(document).ready(function () {
 
   handleTabs();
   var p = new Ping();
+
+  $('#nav-table-controls, #ping-controls').hide();
 
   var table = $('#table-serverlist').DataTable({
     ajax: GLOBAL.api_url + '/server_list',
@@ -143,6 +147,10 @@ $(document).ready(function () {
       $('#table-controls .dt-buttons').addClass('pull-right');
       $('#table-controls').show();
 
+      if (location.hash == "#serverlist" || location.hash == false) {
+        $('#nav-table-controls, #ping-controls').show();
+      }
+
       var searchTerm = $('#table-serverlist_filter input').val();
       if (searchTerm) {
         $('#search-clear').removeClass('hidden');
@@ -154,7 +162,6 @@ $(document).ready(function () {
     },
     drawCallback: function (settings) {
       $('#table-controls').show();
-
     }
   });
 
@@ -204,10 +211,12 @@ $(document).ready(function () {
 
           }, 5000); // ping
 
-          table
-              .column( 9 )
-              .order( 'asc' )
+          if (sortIt) {
+            table
+              //.column(9)
+              .columns([4, 'desc'], [9, 'asc'])
               .draw();
+          }
 
           i++;
           timeoutSpeed = timeoutSpeed + 10;
@@ -233,6 +242,10 @@ $(document).ready(function () {
     });
 
   }
+
+  $('th').click(function() {
+    sortIt = false;
+  });
 
   // Get the stats and filter them down.
   $.get(GLOBAL.api_url + '/player_stats/', function (response) {
@@ -386,7 +399,7 @@ $(document).ready(function () {
 
     }
 
-    $('#nav-table-controls').hide();
+    $('#nav-table-controls, #ping-controls').hide();
 
     table.fixedHeader.adjust();
 
@@ -401,7 +414,7 @@ $(document).ready(function () {
 
   $('[href=#serverlist]').click(function() {
     setTimeout(function() {
-      $('#nav-table-controls').show();
+      $('#nav-table-controls, #ping-controls').show();
     }, 10);
   });
 
