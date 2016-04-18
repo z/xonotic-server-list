@@ -174,8 +174,6 @@ $(document).ready(function () {
 
     var ipsFiltered = ips.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 
-    console.log(ipsFiltered)
-
     var i = 0;
     var timeoutSpeed = 10;
     var ipsLength = ipsFiltered.length;
@@ -186,7 +184,7 @@ $(document).ready(function () {
 
       var ip = ipsFiltered.pop();
 
-      if (i < ipsLength) {
+      if (i < ipsLength && pollIt) {
 
         setTimeout(function() {
 
@@ -222,7 +220,17 @@ $(document).ready(function () {
 
     } // ping server
 
+    var pollIt = true;
     pingServer(ipsFiltered, timeoutSpeed);
+
+    $('#refresh-pings').click(function() {
+      pollIt = true;
+      refreshPings();
+    });
+
+    $('#stop-pings').click(function() {
+      pollIt = false;
+    });
 
   }
 

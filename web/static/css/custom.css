@@ -36,7 +36,9 @@
 #table-serverlist_length, #table-serverlist_filter {
     margin-left: 10px;
 }
-
+#pingbox {
+    margin-top: 8px;
+}
 table.dataTable {
     z-index: 1001;
 }
