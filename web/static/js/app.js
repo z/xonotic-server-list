@@ -1,7 +1,5 @@
 $(document).ready(function () {
 
-  var sortIt = true;
-
   function flatten(obj, includePrototype, into, prefix) {
     into = into || {};
     prefix = prefix || "";
@@ -35,8 +33,11 @@ $(document).ready(function () {
       window.location.hash = e.target.hash;
     });
   }
-
+  
   handleTabs();
+
+  var sortIt = true;
+  var pollIt = false;  
   var p = new Ping();
 
   $('#nav-table-controls, #ping-controls').hide();
@@ -156,15 +157,53 @@ $(document).ready(function () {
         $('#search-clear').removeClass('hidden');
       }
 
-      setTimeout(function() {
-        refreshPings();
-      }, 1000);
     },
     drawCallback: function (settings) {
       $('#table-controls').show();
     }
   });
 
+  function pingServer(ipsFiltered, timeoutSpeed, i, ipsLength, tableApi) {
+
+    var ip = ipsFiltered.pop();
+
+    if (i < ipsLength && pollIt) {
+
+      setTimeout(function() {
+
+        p.ping('http://' + ip, function (ping) {
+
+          var dd = tableApi
+            .rows()
+            .eq(0)
+            .each(function(index) {
+              var row = tableApi.row( index );
+
+              if ( row.data().address.indexOf(ip) > -1 ) {
+                tableApi.cell(index, 9).data(ping);
+              }
+
+            });
+
+        }, 5000); // ping
+
+        if (sortIt) {
+          table
+            //.column(9)
+            .columns([4, 'desc'], [9, 'asc'])
+            .draw();
+        }
+
+        i++;
+        timeoutSpeed = timeoutSpeed + 10;
+
+        pingServer(ipsFiltered, timeoutSpeed, i, ipsLength, tableApi);
+
+      }, timeoutSpeed); // setTimeout
+
+    } // if
+
+  } // ping server
 
   function refreshPings() {
     var tableApi = $('#table-serverlist').DataTable();
@@ -186,62 +225,20 @@ $(document).ready(function () {
     var ipsLength = ipsFiltered.length;
 
     ipsFiltered = ipsFiltered.reverse();
-   
-    function pingServer(ipsFiltered, timeoutSpeed) {
 
-      var ip = ipsFiltered.pop();
-
-      if (i < ipsLength && pollIt) {
-
-        setTimeout(function() {
-
-          p.ping('http://' + ip, function (ping) {
-
-            var dd = tableApi
-              .rows()
-              .eq(0)
-              .each(function(index) {
-                var row = tableApi.row( index );
-
-                if ( row.data().address.indexOf(ip) > -1 ) {
-                  tableApi.cell(index, 9).data(ping);
-                }
-
-              });
-
-          }, 5000); // ping
-
-          if (sortIt) {
-            table
-              //.column(9)
-              .columns([4, 'desc'], [9, 'asc'])
-              .draw();
-          }
-
-          i++;
-          timeoutSpeed = timeoutSpeed + 10;
-          
-          pingServer(ipsFiltered, timeoutSpeed);
-
-        }, timeoutSpeed); // setTimeout
-
-      } // if
-
-    } // ping server
-
-    var pollIt = true;
-    pingServer(ipsFiltered, timeoutSpeed);
-
-    $('#refresh-pings').click(function() {
-      pollIt = true;
-      refreshPings();
-    });
-
-    $('#stop-pings').click(function() {
-      pollIt = false;
-    });
+    pollIt = true;
+    pingServer(ipsFiltered, timeoutSpeed, i, ipsLength, tableApi);
 
   }
+
+  $('#refresh-pings').click(function() {
+    pollIt = true;
+    refreshPings();
+  });
+
+  $('#stop-pings').click(function() {
+    pollIt = false;
+  });
 
   $('th').click(function() {
     sortIt = false;

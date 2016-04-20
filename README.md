@@ -106,7 +106,7 @@ Copy the example config file:
 
 ```
 cd web
-cp static/js/example.config.js static/js/config.js
+cp config/example.config.js config/config.js
 ```
 
 ### Usage
