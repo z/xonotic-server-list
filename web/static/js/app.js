@@ -245,7 +245,7 @@ $(document).ready(function () {
   });
 
   // Get the stats and filter them down.
-  $.get(GLOBAL.api_url + '/player_stats/', function (response) {
+  $.get(GLOBAL.api_url + '/player_stats/all', function (response) {
 
     var stats_data = response.data;
 
@@ -325,7 +325,7 @@ $(document).ready(function () {
             culling: true,
             max: 15,
             //format: '%Y-%m-%d %H:%M',
-            format: '%I:%M%p'
+            format: '%m-%d %I:%M%p'
           }
         }
       },

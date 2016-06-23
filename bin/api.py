@@ -1,6 +1,7 @@
 import falcon
 import json
 import calendar
+import sqlite3
 import os
 from falcon_cors import CORS
 from datetime import datetime
@@ -11,18 +12,23 @@ from sqlalchemy import asc, desc, func
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(root_dir)
 
-from bin.sqlalchemy_base import Stats, Servers, Base
+from bin.sqlalchemy_base import Stats, Servers, Base, JsonEncodedDictMerge
 from bin.util import *
 
 
 def row2playerstats(row):
     unix_time = calendar.timegm(row.time.utctimetuple())
 
+    try:
+        countries = json.loads(row.countries)
+    except TypeError or ValueError:
+        countries = row.countries
+
     datapoint = {
         'time': unix_time,
         'total_players': row.total_players,
         'total_bots': row.total_bots,
-        'countries': row.countries,
+        'countries': countries,
     }
 
     return datapoint
@@ -49,10 +55,29 @@ def row2serverlist(row):
 
 
 class PlayerStatsResource:
+
+    def __init__(self, period='all'):
+        self.period = period
+
     def on_get(self, req, resp):
         """Handles GET requests"""
 
-        stats = session.query(Stats)
+        if self.period == 'week':
+            stats = session.query(func.avg(Stats.total_players).label('total_players'),
+                                  func.avg(Stats.total_bots).label('total_bots'),
+                                  func.min(Stats.time).label('time'),
+                                  # func.extract('month', Stats.time).label('month'),
+                                  func.extract('week', Stats.time).label('week'),
+                                  func.extract('day', Stats.time).label('day'),
+                                  func.json_merge(Stats.countries).label('countries'),
+                                  ) \
+                .group_by('day') \
+                .filter(Stats.time >= '2016-06-00')
+            # stats = stats.group_by(Stats.time).filter(Stats.time >= '2016-06-18')
+            # stats = stats.group_by(Stats.week)
+
+        else:
+            stats = session.query(Stats)
 
         if 'day' in req.params:
             filter = int_or_false(req.params['day'])
@@ -68,7 +93,11 @@ class PlayerStatsResource:
 
         data = []
         for row in stats:
-            datapoint = row2playerstats(row)
+
+            if self.period == 'all':
+                datapoint = row2playerstats(row)
+            else:
+                datapoint = row2playerstats(row)
 
             data.append(datapoint)
 
@@ -78,6 +107,7 @@ class PlayerStatsResource:
 
 
 class ServerListResource:
+
     def on_get(self, req, resp):
         """Handles GET requests"""
 
@@ -103,7 +133,14 @@ class ServerListResource:
 
 config = read_config(root_dir + '/config/config.ini')
 
-engine = create_engine(config['stats_database'])
+
+def sqlite_memory_engine_creator():
+    global config
+    con = sqlite3.connect(config['stats_database'].replace('sqlite:///', ''))
+    con.create_aggregate('json_merge', 1, JsonEncodedDictMerge)
+    return con
+
+engine = create_engine(config['stats_database'], creator=sqlite_memory_engine_creator)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker()
@@ -112,5 +149,7 @@ session = DBSession()
 
 cors = CORS(allow_origins_list=[config['frontend_url']])
 api = application = falcon.API(middleware=[cors.middleware])
-api.add_route('/player_stats', PlayerStatsResource())
+api.add_route('/player_stats/all', PlayerStatsResource('all'))
+api.add_route('/player_stats/week', PlayerStatsResource('week'))
+api.add_route('/player_stats/month', PlayerStatsResource('month'))
 api.add_route('/server_list', ServerListResource())

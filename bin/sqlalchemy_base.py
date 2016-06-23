@@ -8,8 +8,32 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+from collections import defaultdict
+
 
 Base = declarative_base()
+
+
+class JsonEncodedDictMerge(object):
+    def __init__(self):
+        self.values = []
+
+    def step(self, value):
+        self.values.append(value)
+
+    def finalize(self):
+
+        sum_dict = defaultdict(int)
+
+        for d in self.values:
+            d1 = json.loads(d)
+            for key, value in d1.items():
+                current = 0
+                if key in sum_dict:
+                    current = sum_dict[key]
+                sum_dict[key] = (current + int(value)) / 2
+
+        return json.dumps(dict(sum_dict))
 
 
 class JsonEncodedDict(sqla.TypeDecorator):
