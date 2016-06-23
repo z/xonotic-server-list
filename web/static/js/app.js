@@ -314,7 +314,22 @@ $(document).ready(function () {
         },
         names: countryNames,
         types: countryTypes,
-        groups: [countryList]
+        groups: [countryList],
+        colors: {
+          countries_CA: '#9e0142',
+          countries_CL: '#d53e4f',
+          countries_DE: '#f46d43',
+          countries_FR: '#fdae61',
+          countries_GB: '#fee08b',
+          countries_NL: '#ffffbf',
+          countries_RU: '#e6f598',
+          countries_UA: '#abdda4',
+          countries_US: '#66c2a5',
+          countries_ZA: '#3288bd',
+          countries_ES: '#5e4fa2',
+          total_players: '#0000cc',
+          moving_average: '#cc0000'
+        }
       };
 
       def.resolve(data);
@@ -327,22 +342,7 @@ $(document).ready(function () {
 
   var chart = c3.generate({
     data: {
-      json: {},
-      colors: {
-        countries_CA: '#9e0142',
-        countries_CL: '#d53e4f',
-        countries_DE: '#f46d43',
-        countries_FR: '#fdae61',
-        countries_GB: '#fee08b',
-        countries_NL: '#ffffbf',
-        countries_RU: '#e6f598',
-        countries_UA: '#abdda4',
-        countries_US: '#66c2a5',
-        countries_ZA: '#3288bd',
-        countries_ES: '#5e4fa2',
-        total_players: '#0000cc',
-        moving_average: '#cc0000'
-      }
+      json: {}
     },
     bindto: '#chart-players',
     axis: {
@@ -376,14 +376,6 @@ $(document).ready(function () {
     }
   });
 
-  $.when(
-    get_player_stats(chart, 'all')
-  ).done(function(response) {
-    console.log(response);
-    window.countryList = response.countryList;
-    chart.load(response.c3data);
-  });
-
   $('#stacked-off').click(function() {
     chart.groups([[]]);
     $(this).addClass('active');
@@ -402,37 +394,55 @@ $(document).ready(function () {
     $('#stacked-off').removeClass('active');
   });
 
-  $('#stacked-on').click();
-
   $('.timespan button').click(function() {
     var $that = $(this);
     var period = $that.attr('data-period');
     $.when(
       get_player_stats(chart, period)
     ).done(function(response) {
+
       $('.timespan button').removeClass('active');
       $that.addClass('active');
-      chart.unload();
-      //chart.destroy();
-      console.log(response);
-      chart.groups([response.countryList]);
-      response.c3data['unload'] = true;
-      // chart.load({json: {}, unload: true });
-      chart.load(response.c3data);
-      // chart.data.axes({
-      //   x: {
-      //     type: 'timeseries',
-      //     tick: {
-      //       // waiting on this https://github.com/masayuki0812/c3/pull/1400
-      //       culling: true,
-      //       max: 15,
-      //       //format: '%Y-%m-%d %H:%M',
-      //       format: '%m-%d %I:%M%p'
-      //     }
-      //   }
-      // });
+
+      chart = c3.generate({
+        data: response.c3data,
+        bindto: '#chart-players',
+        axis: {
+          x: {
+            type: 'timeseries',
+            tick: {
+              // waiting on this https://github.com/masayuki0812/c3/pull/1400
+              culling: true,
+              max: 15,
+              //format: '%Y-%m-%d %H:%M',
+              format: '%m-%d %I:%M%p'
+            }
+          }
+        },
+        groups: [response.countryList],
+        subchart: {
+          show: true
+        },
+        zoom: {
+          enabled: true
+        },
+        point: {
+          show: false
+        },
+        onrendered: function () {
+          // Mostly c3 hacks
+          if ($('#stacked-on').hasClass('active')) {
+            $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7);
+          } else {
+            $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.4);
+          }
+        }
+      });
+
     });
   });
+
+  $('.timespan button[data-period=all]').click();
 
   // Need to hide datatables when changing tabs for fixedHeader
   var visible = true;

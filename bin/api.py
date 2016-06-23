@@ -1,10 +1,10 @@
 import falcon
 import json
+import datetime
 import calendar
 import sqlite3
 import os
 from falcon_cors import CORS
-from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import asc, desc, func
@@ -62,7 +62,21 @@ class PlayerStatsResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
 
-        if self.period == 'week':
+        if self.period != 'all':
+
+            group_it_by = 'day'
+            today = datetime.date.today()
+
+            if self.period == 'week':
+                group_it_by = 'day'
+                duration = datetime.timedelta(days=7)
+
+            if self.period == 'month':
+                group_it_by = 'week'
+                duration = datetime.timedelta(days=31)
+
+            history_until = today - duration
+
             stats = session.query(func.avg(Stats.total_players).label('total_players'),
                                   func.avg(Stats.total_bots).label('total_bots'),
                                   func.min(Stats.time).label('time'),
@@ -71,8 +85,9 @@ class PlayerStatsResource:
                                   func.extract('day', Stats.time).label('day'),
                                   func.json_merge(Stats.countries).label('countries'),
                                   ) \
-                .group_by('day') \
-                .filter(Stats.time >= '2016-06-00')
+                .group_by(group_it_by) \
+                .filter(Stats.time >= history_until)
+
             # stats = stats.group_by(Stats.time).filter(Stats.time >= '2016-06-18')
             # stats = stats.group_by(Stats.week)
 
