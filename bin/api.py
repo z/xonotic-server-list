@@ -62,31 +62,38 @@ class PlayerStatsResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
 
+        limit = 288
+
         if self.period != 'all':
 
             group_it_by = 'day'
             today = datetime.date.today()
 
             if self.period == 'week':
-                group_it_by = 'day'
+                group_it_by = 'hour, weekday'
+                limit = 500
                 duration = datetime.timedelta(days=7)
 
             if self.period == 'month':
-                group_it_by = 'week'
+                group_it_by = 'day'
+                limit = 31
                 duration = datetime.timedelta(days=31)
 
-            history_until = today - duration
+            start_date = today - duration
 
-            stats = session.query(func.avg(Stats.total_players).label('total_players'),
-                                  func.avg(Stats.total_bots).label('total_bots'),
-                                  func.min(Stats.time).label('time'),
-                                  # func.extract('month', Stats.time).label('month'),
-                                  func.extract('week', Stats.time).label('week'),
-                                  func.extract('day', Stats.time).label('day'),
-                                  func.json_merge(Stats.countries).label('countries'),
-                                  ) \
+            stats = session.query(
+                    Stats.hour.label('hour'),
+                    Stats.weekday.label('weekday'),
+                    func.avg(Stats.total_players).label('total_players'),
+                    func.avg(Stats.total_bots).label('total_bots'),
+                    func.min(Stats.time).label('time'),
+                    # func.extract('month', Stats.time).label('month'),
+                    # func.extract('week', Stats.time).label('week'),
+                    func.extract('day', Stats.time).label('day'),
+                    func.json_merge(Stats.countries).label('countries'),
+                ) \
                 .group_by(group_it_by) \
-                .filter(Stats.time >= history_until)
+                .filter(Stats.time >= start_date)
 
             # stats = stats.group_by(Stats.time).filter(Stats.time >= '2016-06-18')
             # stats = stats.group_by(Stats.week)
@@ -104,7 +111,7 @@ class PlayerStatsResource:
             if 0 <= filter <= 24:
                 stats = stats.filter_by(hour=filter)
 
-        stats = stats.order_by(desc(Stats.id)).limit(288)
+        stats = stats.order_by(desc(Stats.id)).limit(limit)
 
         data = []
         for row in stats:
