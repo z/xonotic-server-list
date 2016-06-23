@@ -79,7 +79,7 @@ table.dataTable.fixedHeader-locked {
 .chart-wrapper {
     text-align:right;
 }
-.chart-wrapper .timespan {
+.chart-wrapper .timespan, .chart-wrapper .stacking {
     margin-bottom: 10px;
 }
 .c3-event-rects {

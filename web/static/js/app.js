@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+  window.countryList = [];
+
   function flatten(obj, includePrototype, into, prefix) {
     into = into || {};
     prefix = prefix || "";
@@ -244,54 +246,66 @@ $(document).ready(function () {
     sortIt = false;
   });
 
+
   // Get the stats and filter them down.
-  $.get(GLOBAL.api_url + '/player_stats/all', function (response) {
+  var get_player_stats = function(chart, period) {
 
-    var stats_data = response.data;
+    var def = new $.Deferred();
 
-    // Need to do this until: https://github.com/masayuki0812/c3/issues/1471
-    var acc = 0;
-    function flattenCountries(element, index, array) {
-      var p1 = element.total_players;
-      acc += p1;
-      var moving_average = acc / (index + 1);
-      element.time = element.time * 1000;
-      element.moving_average = moving_average.toFixed(2);
-      c3data.push(flatten(element));
-      $.each(element.countries, function(index, value) {
-        allCountries.push('countries_' + index);
+    period = (period == undefined) ? 'all' : period;
+
+    $.get(GLOBAL.api_url + '/player_stats/' + period, function (response) {
+
+      var stats_data = response.data;
+
+      // Need to do this until: https://github.com/masayuki0812/c3/issues/1471
+      var acc = 0;
+
+      function flattenCountries(element, index, array) {
+        var p1 = element.total_players;
+        acc += p1;
+        var moving_average = acc / (index + 1);
+        element.time = element.time * 1000;
+        element.moving_average = moving_average.toFixed(2);
+        c3data.push(flatten(element));
+        $.each(element.countries, function (index, value) {
+          allCountries.push('countries_' + index);
+        });
+      }
+
+      var c3data = [];
+      var allCountries = [];
+      stats_data.forEach(flattenCountries);
+
+      var countryList = allCountries.filter(function (item, i, ar) {
+        return ar.indexOf(item) === i;
       });
-    }
 
-    var c3data = [];
-    var allCountries = [];
-    stats_data.forEach(flattenCountries);
+      var countryTypes = {};
+      for (var i = 0; i < countryList.length; i++) {
+        countryTypes[countryList[i]] = 'area-spline';
+      }
 
-    var countryList = allCountries.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+      countryTypes['total_players'] = 'line';
+      countryTypes['moving_average'] = 'line';
 
-    var countryTypes = {};
-    for (var i = 0; i < countryList.length; i++) {
-      countryTypes[countryList[i]] = 'area-spline';
-    }
+      var countryNames = {};
+      for (var i = 0; i < countryList.length; i++) {
+        countryNames[countryList[i]] = countryList[i].replace('countries_', '');
+      }
 
-    countryTypes['total_players'] = 'line';
-    countryTypes['moving_average'] = 'line';
+      countryNames['total_players'] = 'Total Players';
+      countryNames['moving_average'] = 'Moving Average';
 
-    var countryNames = {};
-    for (var i = 0; i < countryList.length; i++) {
-      countryNames[countryList[i]] = countryList[i].replace('countries_', '');
-    }
+      var xKeys = countryList.slice().sort();
+      xKeys.push('total_players');
+      xKeys.push('moving_average');
 
-    countryNames['total_players'] = 'Total Players';
-    countryNames['moving_average'] = 'Moving Average';
+      //chart.load(c3data);
+      var data = {};
 
-    var xKeys = countryList.slice().sort();
-    xKeys.push('total_players');
-    xKeys.push('moving_average');
-
-    var chart = c3.generate({
-      bindto: '#chart-players',
-      data: {
+      data['countryList'] = countryList;
+      data['c3data'] = {
         order: null,
         json: c3data,
         keys: {
@@ -299,75 +313,125 @@ $(document).ready(function () {
           x: 'time'
         },
         names: countryNames,
-        colors: {
-          countries_CA: '#9e0142',
-          countries_CL: '#d53e4f',
-          countries_DE: '#f46d43',
-          countries_FR: '#fdae61',
-          countries_GB: '#fee08b',
-          countries_NL: '#ffffbf',
-          countries_RU: '#e6f598',
-          countries_UA: '#abdda4',
-          countries_US: '#66c2a5',
-          countries_ZA: '#3288bd',
-          countries_ES: '#5e4fa2',
-          total_players: '#0000cc',
-          moving_average: '#cc0000'
-        },
         types: countryTypes,
         groups: [countryList]
-      },
-      axis: {
-        x: {
-          type: 'timeseries',
-          tick: {
-            // waiting on this https://github.com/masayuki0812/c3/pull/1400
-            culling: true,
-            max: 15,
-            //format: '%Y-%m-%d %H:%M',
-            format: '%m-%d %I:%M%p'
-          }
-        }
-      },
-      subchart: {
-        show: true
-      },
-      zoom: {
-        enabled: true
-      },
-      point: {
-        show: false
-      },
-      onrendered: function () {
-        // Mostly c3 hacks
-        if ($('#stacked-on').hasClass('active')) {
-          $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7);
-        } else {
-          $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.4);
+      };
+
+      def.resolve(data);
+
+    });
+
+    return def;
+
+  }; // get_player_stats
+
+  var chart = c3.generate({
+    data: {
+      json: {},
+      colors: {
+        countries_CA: '#9e0142',
+        countries_CL: '#d53e4f',
+        countries_DE: '#f46d43',
+        countries_FR: '#fdae61',
+        countries_GB: '#fee08b',
+        countries_NL: '#ffffbf',
+        countries_RU: '#e6f598',
+        countries_UA: '#abdda4',
+        countries_US: '#66c2a5',
+        countries_ZA: '#3288bd',
+        countries_ES: '#5e4fa2',
+        total_players: '#0000cc',
+        moving_average: '#cc0000'
+      }
+    },
+    bindto: '#chart-players',
+    axis: {
+      x: {
+        type: 'timeseries',
+        tick: {
+          // waiting on this https://github.com/masayuki0812/c3/pull/1400
+          culling: true,
+          max: 15,
+          //format: '%Y-%m-%d %H:%M',
+          format: '%m-%d %I:%M%p'
         }
       }
+    },
+    subchart: {
+      show: true
+    },
+    zoom: {
+      enabled: true
+    },
+    point: {
+      show: false
+    },
+    onrendered: function () {
+      // Mostly c3 hacks
+      if ($('#stacked-on').hasClass('active')) {
+        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.7);
+      } else {
+        $('.c3-shapes.c3-areas .c3-shape').css('opacity', 0.4);
+      }
+    }
+  });
+
+  $.when(
+    get_player_stats(chart, 'all')
+  ).done(function(response) {
+    console.log(response);
+    window.countryList = response.countryList;
+    chart.load(response.c3data);
+  });
+
+  $('#stacked-off').click(function() {
+    chart.groups([[]]);
+    $(this).addClass('active');
+    setTimeout(function() {
+      $('.c3-shapes.c3-areas .c3-shape').animate({'opacity': 0.4}, 200);
+    }, 450);
+    $('#stacked-on').removeClass('active');
+  });
+
+  $('#stacked-on').click(function() {
+    chart.groups([window.countryList]);
+    $(this).addClass('active');
+    setTimeout(function() {
+      $('.c3-shapes.c3-areas .c3-shape').animate({'opacity': 0.7}, 200);
+    }, 450);
+    $('#stacked-off').removeClass('active');
+  });
+
+  $('#stacked-on').click();
+
+  $('.timespan button').click(function() {
+    var $that = $(this);
+    var period = $that.attr('data-period');
+    $.when(
+      get_player_stats(chart, period)
+    ).done(function(response) {
+      $('.timespan button').removeClass('active');
+      $that.addClass('active');
+      chart.unload();
+      //chart.destroy();
+      console.log(response);
+      chart.groups([response.countryList]);
+      response.c3data['unload'] = true;
+      // chart.load({json: {}, unload: true });
+      chart.load(response.c3data);
+      // chart.data.axes({
+      //   x: {
+      //     type: 'timeseries',
+      //     tick: {
+      //       // waiting on this https://github.com/masayuki0812/c3/pull/1400
+      //       culling: true,
+      //       max: 15,
+      //       //format: '%Y-%m-%d %H:%M',
+      //       format: '%m-%d %I:%M%p'
+      //     }
+      //   }
+      // });
     });
-
-    $('#stacked-off').click(function() {
-      chart.groups([[]]);
-      $(this).addClass('active');
-      setTimeout(function() {
-        $('.c3-shapes.c3-areas .c3-shape').animate({'opacity': 0.4}, 200);
-      }, 450);
-      $('#stacked-on').removeClass('active');
-    });
-
-    $('#stacked-on').click(function() {
-      chart.groups([countryList]);
-      $(this).addClass('active');
-      setTimeout(function() {
-        $('.c3-shapes.c3-areas .c3-shape').animate({'opacity': 0.7}, 200);
-      }, 450);
-      $('#stacked-off').removeClass('active');
-    });
-
-    $('#stacked-on').click();
-
   });
 
   // Need to hide datatables when changing tabs for fixedHeader
